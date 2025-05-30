@@ -54,15 +54,17 @@ int main(int argc, char *argv[]) {
 	/*EMPIEZA EL PROGRAMA DEL CLIENTE*/
 
 	char opcion, opcionAdmin, opcionAdminTrasteros;
+	char opcionUsuario,opcionUsuarioMenu,opcionMenuCatalogo;
 	char usuarioAdmin[50], contrasena[50];
 
 	do {
 	    opcion = mostrarMenuPrincipal();
-	    sprintf(sendBuff, "%c", opcion); // Almacena la opcion
-	    send(s, sendBuff, sizeof(sendBuff), 0); // enviar
-	    recv(s, recvBuff, sizeof(recvBuff), 0);  // recibir
-	    cout<<recvBuff<<endl;
-
+		memset(sendBuff, 0, sizeof(sendBuff));
+		sprintf(sendBuff, "%c", opcion); // Enviar la opción
+		send(s, sendBuff, strlen(sendBuff)+1, 0);
+		memset(recvBuff, 0, sizeof(recvBuff));
+		recv(s, recvBuff, sizeof(recvBuff), 0);
+		cout << recvBuff << endl;
 	    switch (opcion) {
 	    case '1': {
 	        // admin
@@ -101,7 +103,7 @@ int main(int argc, char *argv[]) {
 	        do {
 	            opcionAdmin = menuAdministrador();
 	            memset(sendBuff, 0, sizeof(sendBuff));
-				sprintf(sendBuff, "%c", opcionAdmin); // Enviar la opción correcta
+				sprintf(sendBuff, "%c", opcionAdmin); // Enviar la opción
 				send(s, sendBuff, strlen(sendBuff)+1, 0);
 				memset(recvBuff, 0, sizeof(recvBuff));
 				recv(s, recvBuff, sizeof(recvBuff), 0);
@@ -164,7 +166,6 @@ int main(int argc, char *argv[]) {
 	                break;
 	            }
 	            case '2':{
-	            	// CÓDIGO CLIENTE
 	            	char numTrastero[50];
 	            	cout << "ELIMINAR TRASTERO" << endl;
 	            	cout << "-----------------" << endl;
@@ -255,7 +256,6 @@ int main(int argc, char *argv[]) {
 	                break;
 	            }
 	            case '4':{
-	            	// LIMPIAR BUFFERS ANTES DE ENVIAR
 	            	opcionAdminTrasteros = menuTrasterosAdmin();
 	            	memset(sendBuff, 0, sizeof(sendBuff));
 					sprintf(sendBuff, "%c", opcionAdminTrasteros); // Enviar la opción correcta
@@ -418,8 +418,9 @@ int main(int argc, char *argv[]) {
 
 					}
 	            }
-
+	            case '0': cout<<"Saliendo del menú administrador..."<<endl;
 	            default:
+	            	cout<<"\033[1;31mOpcion Incorrecta.\033[0m"<<endl;
 	                break;
 	            }
 	        } while (opcionAdmin != '0');
@@ -428,9 +429,518 @@ int main(int argc, char *argv[]) {
 	    }
 	    case '2': {
 	        //USUARIO
+	    	do{
+	    		//INICIAR SESION/REGISTRARSE
+	    		opcionUsuario=menuIniReg();
+	    		memset(sendBuff, 0, sizeof(sendBuff));
+				sprintf(sendBuff, "%c", opcionUsuario); // Enviar la opción
+				send(s, sendBuff, strlen(sendBuff)+1, 0);
+				memset(recvBuff, 0, sizeof(recvBuff));
+				recv(s, recvBuff, sizeof(recvBuff), 0);
+				cout << recvBuff << endl;
+
+				switch (opcionUsuario) {
+					case '1'://Iniciar sesion
+						int dni,dniUser;
+						char contrasena[50];
+						cout << "INICIAR SESION USUARIO" << endl;
+						cout << "--------------------" << endl;
+						cout << "Ingrese dni: ";
+						cin >> dni;
+
+						// Enviar DNI como entero (convertido a string para envío)
+						memset(sendBuff, 0, sizeof(sendBuff));
+						sprintf(sendBuff, "%d", dni); // Convertir int a string
+						send(s, sendBuff, strlen(sendBuff) + 1, 0); // enviar DNI
+
+						// Recibir confirmación del DNI
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						cout << "Ingrese contraseña: ";
+						cin >> contrasena;
+
+						// Enviar contraseña
+						memset(sendBuff, 0, sizeof(sendBuff));
+						strcpy(sendBuff, contrasena);
+						send(s, sendBuff, strlen(sendBuff) + 1, 0); // enviar contraseña
+
+						// Recibir confirmación de la contraseña
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						//Para flags
+						// RECIBIR RESULTADO DE AUTENTICACIÓN
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout<<recvBuff<<endl;
+						dniUser = atoi(recvBuff);
+						if(dniUser!=-1){
+							//EL USUARIO HA INICIADO SESION
+							cout << "\033[1;32mInicio de sesion correcto\033[0m" << endl;
+
+							do{
+								opcionUsuarioMenu=menuCliente();
+								memset(sendBuff, 0, sizeof(sendBuff));
+								sprintf(sendBuff, "%c", opcionUsuarioMenu); // Enviar la opción
+								send(s, sendBuff, strlen(sendBuff)+1, 0);
+								memset(recvBuff, 0, sizeof(recvBuff));
+								recv(s, recvBuff, sizeof(recvBuff), 0);
+								cout << recvBuff << endl;
+
+								switch (opcionUsuarioMenu) {
+									case '1'://perfil
+										// Recibir y mostrar los datos del perfil
+										char nombreP[50],apellidoP[50],emailP[50],direccionP[50];
+										int dniP,telefonoP;
+										// Recibir nombre
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										strcpy(nombreP, recvBuff);
+
+										// Recibir apellidos
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										strcpy(apellidoP, recvBuff);
+
+										// Recibir DNI
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										dniP = atoi(recvBuff);
+
+										// Recibir teléfono
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										telefonoP = atoi(recvBuff);
+
+										// Recibir email
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										strcpy(emailP, recvBuff);
+
+										// Recibir dirección
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										strcpy(direccionP, recvBuff);
+
+										cout<<"---------------"<<endl;
+										cout<<"PERFIL"<<endl;
+										cout<<"---------------"<<endl;
+										cout<<"DATOS DEL USUARIO"<<endl;
+										cout<<"- Nombre: "<<nombreP<<endl;
+										cout<<"- Apellido: "<<apellidoP<<endl;
+										cout<<"- DNI: "<< dniP<<endl;
+										cout<<"----------------------"<<endl;
+										cout<<"DATOS DE CONTACTO"<<endl;
+										cout<<"- Telefono: "<<telefonoP<<endl;
+										cout<<"- Email: "<<emailP<<endl;
+										cout<<"- Direccion: "<<direccionP<<endl;
+										break;
+									case '2'://catalogo
+										do{
+											opcionMenuCatalogo = menuCatalogo();
+											memset(sendBuff, 0, sizeof(sendBuff));
+											sprintf(sendBuff, "%c", opcionMenuCatalogo); // Enviar la opción
+											send(s, sendBuff, strlen(sendBuff)+1, 0);
+											memset(recvBuff, 0, sizeof(recvBuff));
+											recv(s, recvBuff, sizeof(recvBuff), 0);
+											cout << recvBuff << endl;
+											switch (opcionMenuCatalogo) {
+												case '1':{
+													//VER TODO EL CATALOGO
+													int i, numTrasteros;
+													int numero, numValoraciones;
+													float metros, precio, valoracion;
+													char disponibilidad[20];
+													memset(recvBuff, 0, sizeof(recvBuff));
+													recv(s, recvBuff, sizeof(recvBuff), 0);
+													numTrasteros = atoi(recvBuff);
+													cout << "Numero de Trasteros: " << numTrasteros << endl;
+													printf("\033[1;34m%s%20s%20s%20s%30s%20s\n\033[0m", "NºTRASTERO", "m²", "PRECIO", "VALORACION", "NUMERO DE VALORACIONES", "DISPONIBILIDAD");
+													for(i = 0; i < numTrasteros; i++){
+													        // Recibir número del trastero
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        numero = atoi(recvBuff);
+
+													        // Recibir metros cuadrados
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        metros = atof(recvBuff);
+
+													        // Recibir precio
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        precio = atoi(recvBuff);
+
+													        // Recibir valoración
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        valoracion = atof(recvBuff);
+
+													        // Recibir número de valoraciones
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        numValoraciones = atoi(recvBuff);
+
+													        // Recibir disponibilidad
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        strcpy(disponibilidad, recvBuff);
+
+													        // Mostrar la información del trastero
+													        printf("%10d%20.2f%20.2f%20.2f%30d%20s\n",
+													               numero, metros, precio, valoracion, numValoraciones, disponibilidad);
+													    }
+												break;}
+												case '2':{//FILTRAR POR PRECIO
+													int i, numTrasteros;
+													int numero, numValoraciones;
+													float metros, precio, valoracion;
+													char disponibilidad[20];
+													memset(recvBuff, 0, sizeof(recvBuff));
+													recv(s, recvBuff, sizeof(recvBuff), 0);
+													numTrasteros = atoi(recvBuff);
+													cout << "Numero de Trasteros: " << numTrasteros << endl;
+													printf("\033[1;34m%s%20s%20s%20s%30s%20s\n\033[0m", "NºTRASTERO", "m²", "PRECIO", "VALORACION", "NUMERO DE VALORACIONES", "DISPONIBILIDAD");
+													for(i = 0; i < numTrasteros; i++){
+													        // Recibir número del trastero
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        numero = atoi(recvBuff);
+
+													        // Recibir metros cuadrados
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        metros = atof(recvBuff);
+
+													        // Recibir precio
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        precio = atoi(recvBuff);
+
+													        // Recibir valoración
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        valoracion = atof(recvBuff);
+
+													        // Recibir número de valoraciones
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        numValoraciones = atoi(recvBuff);
+
+													        // Recibir disponibilidad
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        strcpy(disponibilidad, recvBuff);
+
+													        // Mostrar la información del trastero
+													        printf("%10d%20.2f%20.2f%20.2f%30d%20s\n",
+													               numero, metros, precio, valoracion, numValoraciones, disponibilidad);
+													    }
+													break;}
+												case '3':{//FILTRAR POR METROS CUADRADOS
+													int i, numTrasteros;
+													int numero, numValoraciones;
+													float metros, precio, valoracion;
+													char disponibilidad[20];
+													memset(recvBuff, 0, sizeof(recvBuff));
+													recv(s, recvBuff, sizeof(recvBuff), 0);
+													numTrasteros = atoi(recvBuff);
+													cout << "Numero de Trasteros: " << numTrasteros << endl;
+													printf("\033[1;34m%s%20s%20s%20s%30s%20s\n\033[0m", "NºTRASTERO", "m²", "PRECIO", "VALORACION", "NUMERO DE VALORACIONES", "DISPONIBILIDAD");
+													for(i = 0; i < numTrasteros; i++){
+													        // Recibir número del trastero
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        numero = atoi(recvBuff);
+
+													        // Recibir metros cuadrados
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        metros = atof(recvBuff);
+
+													        // Recibir precio
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        precio = atoi(recvBuff);
+
+													        // Recibir valoración
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        valoracion = atof(recvBuff);
+
+													        // Recibir número de valoraciones
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        numValoraciones = atoi(recvBuff);
+
+													        // Recibir disponibilidad
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        strcpy(disponibilidad, recvBuff);
+
+													        // Mostrar la información del trastero
+													        printf("%10d%20.2f%20.2f%20.2f%30d%20s\n",
+													               numero, metros, precio, valoracion, numValoraciones, disponibilidad);
+													    }
+													break;}
+												case '4':{//FILTRAR POR VALORACION
+													int i, numTrasteros;
+													int numero, numValoraciones;
+													float metros, precio, valoracion;
+													char disponibilidad[20];
+													memset(recvBuff, 0, sizeof(recvBuff));
+													recv(s, recvBuff, sizeof(recvBuff), 0);
+													numTrasteros = atoi(recvBuff);
+													cout << "Numero de Trasteros: " << numTrasteros << endl;
+													printf("\033[1;34m%s%20s%20s%20s%30s%20s\n\033[0m", "NºTRASTERO", "m²", "PRECIO", "VALORACION", "NUMERO DE VALORACIONES", "DISPONIBILIDAD");
+													for(i = 0; i < numTrasteros; i++){
+													        // Recibir número del trastero
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        numero = atoi(recvBuff);
+
+													        // Recibir metros cuadrados
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        metros = atof(recvBuff);
+
+													        // Recibir precio
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        precio = atoi(recvBuff);
+
+													        // Recibir valoración
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        valoracion = atof(recvBuff);
+
+													        // Recibir número de valoraciones
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        numValoraciones = atoi(recvBuff);
+
+													        // Recibir disponibilidad
+													        memset(recvBuff, 0, sizeof(recvBuff));
+													        recv(s, recvBuff, sizeof(recvBuff), 0);
+													        strcpy(disponibilidad, recvBuff);
+
+													        // Mostrar la información del trastero
+													        printf("%10d%20.2f%20.2f%20.2f%30d%20s\n",
+													               numero, metros, precio, valoracion, numValoraciones, disponibilidad);
+													    }
+													break;}
+												case '0':
+													cout<<"Volviendo al menu Cliente..."<<endl;
+													break;
+
+												default:cout<<"\033[1;31mOpcion Incorrecta.\033[0m"<<endl;
+													break;
+											}
+										}while(opcionMenuCatalogo!='0');
+										break;
+									case '3':{
+										//Alquilar Trastero
+										int flag;
+										char numTrastero[20];
+										cout<<"ALQUILAR TRASTERO"<<endl;
+										cout<<"--------------------"<<endl;
+										cout<<"Introduce el numero de trastero: ";
+										cin>>numTrastero;
+										// Enviar nombre
+										memset(sendBuff, 0, sizeof(sendBuff));
+										strcpy(sendBuff, numTrastero);
+										send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+										// Recibir confirmacion de lo que ha recibido el servidor
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										cout<<recvBuff<<endl;
+
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										flag = atoi(recvBuff);
+										switch (flag) {
+											case 0:
+												cout<<"\033[0;33mLo sentimos, este trastero no está disponible en nuestro catálogo.\033[0m"<<endl;
+												break;
+											case 1:
+												cout<<"\033[0;32mEl trastero con numero "<<numTrastero<< " ha sido correctamente alquilado por "<<nombreP<<" \033[0m"<<endl;
+												break;
+											case 2:
+												cout<<"\033[0;31mNo existe este trastero en nuestro catálogo.\033[0m"<<endl;
+												break;
+											default:
+												cout<<"\033[0;31mNo se ha podido alquilar el trastero.\033[0m"<<endl;
+												break;
+										}
+
+										break;
+									}
+									case '4'://Devolver trastero
+										break;
+									case '0':cout<<"Volviendo a menu Cliente..."<<endl;
+										break;
+									default:cout<<"\033[1;31mOpcion Incorrecta.\033[0m"<<endl;
+										break;
+								}
+							}while(opcionUsuarioMenu);
+						}else{
+							cout << "\033[1;31mDni o contraseña incorrecta.\033[0m" << endl;
+						}
+						break;
+					case '2'://Registrarse
+						char nombre[50],apellido[50],email[100],direccion[100],contrasenia[50],confirmarContrasena[50],telefono[20],dniReg[20];
+						int resultadoRegistro;
+
+						cout << "REGISTRO DE USUARIO" << endl;
+						cout << "-------------------" << endl;
+
+						cout << "Ingrese nombre: ";
+						cin >> nombre;
+
+						// Enviar nombre
+						memset(sendBuff, 0, sizeof(sendBuff));
+						strcpy(sendBuff, nombre);
+						send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+						// Recibir confirmación del nombre
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						cout << "Ingrese apellido: ";
+						cin >> apellido;
+
+						// Enviar apellido
+						memset(sendBuff, 0, sizeof(sendBuff));
+						strcpy(sendBuff, apellido);
+						send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+						// Recibir confirmación del apellido
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						cout << "Ingrese email: ";
+						cin >> email;
+
+						// Enviar email
+						memset(sendBuff, 0, sizeof(sendBuff));
+						strcpy(sendBuff, email);
+						send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+						// Recibir confirmación del email
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						cout << "Ingrese direccion: ";
+						cin >> direccion;
+
+						// Enviar direccion
+						memset(sendBuff, 0, sizeof(sendBuff));
+						strcpy(sendBuff, direccion);
+						send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+						// Recibir confirmación de la direccion
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						cout << "Ingrese contraseña: ";
+						cin >> contrasenia;
+
+						// Enviar contraseña
+						memset(sendBuff, 0, sizeof(sendBuff));
+						strcpy(sendBuff, contrasenia);
+						send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+						// Recibir confirmación de la contraseña
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						cout << "Confirme contraseña: ";
+						cin >> confirmarContrasena;
+
+						// Enviar confirmar contraseña
+						memset(sendBuff, 0, sizeof(sendBuff));
+						strcpy(sendBuff, confirmarContrasena);
+						send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+						// Recibir confirmación de confirmar contraseña
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						cout << "Ingrese telefono: ";
+						cin >> telefono;
+
+						// Enviar telefono
+						memset(sendBuff, 0, sizeof(sendBuff));
+						strcpy(sendBuff, telefono);
+						send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+						// Recibir confirmación del telefono
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						cout << "Ingrese DNI: ";
+						cin >> dniReg;
+
+						// Enviar DNI
+						memset(sendBuff, 0, sizeof(sendBuff));
+						strcpy(sendBuff, dniReg);
+						send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+						// Recibir confirmación del DNI
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						cout << recvBuff << endl;
+
+						// RECIBIR RESULTADO DEL REGISTRO
+						memset(recvBuff, 0, sizeof(recvBuff));
+						recv(s, recvBuff, sizeof(recvBuff), 0);
+						resultadoRegistro = atoi(recvBuff);
+
+						// PROCESAR RESULTADO
+						switch (resultadoRegistro) {
+						    case 1:
+						        // Verde brillante para éxito
+						        cout << "\033[1;32m¡Usuario registrado correctamente!\033[0m" << endl;
+						        break;
+						    case 0:
+						        // Rojo para error de DNI duplicado
+						        cout << "\033[1;31mError: Este DNI ya está registrado.\033[0m" << endl;
+						        break;
+						    case 2:
+						        // Amarillo para error de contraseña
+						        cout << "\033[1;33mError: Las contraseñas no coinciden.\033[0m" << endl;
+						        break;
+						    default:
+						        // Magenta para otros errores desconocidos
+						        cout << "\033[1;35mError desconocido en el registro.\033[0m" << endl;
+						        break;
+						}
+						break;
+					case '0':
+						cout<<"Saliendo del menu Cliente"<<endl;
+						break;
+					default:
+						break;
+				}
+	    	}while(opcionUsuario!='0');
+
+
 	        break;
 	    }
 	    default:
+	    	cout<<"\033[1;31mOpcion Incorrecta.\033[0m"<<endl;
 	        break;
 	    }
 

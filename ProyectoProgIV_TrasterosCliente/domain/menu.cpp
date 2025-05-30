@@ -38,8 +38,6 @@ char menuIniReg() {
 
 char menuCliente() {
 	char opcion;
-
-	limpiarConsola();
 	cout<<"MENÚ"<<endl;
 	cout<<"1. Perfil"<<endl;
 	cout<<"2. Catalogo"<<endl;
@@ -97,15 +95,5 @@ char menuTrasterosAdmin(){
 	    return opcion;
 }
 
-char menuFicherosAdmin(){
-	char opcion;
-	    cout<<"OBTENER FICHERO.CSV"<<endl;
-	    cout<<"1. OBTENER CSV CON LOS TRASTEROS ACTUALMENTE ALQUILADOS"<<endl;
-	    cout<<"2. OBTENER CSV CON TODOS LOS TRASTEROS QUE HAN SIDO ALQUILADOS"<<endl;
-	    cout<<"0. Salir"<<endl;
-	    cout<<"Seleccione una opcion: ";
-	    cin>>opcion;
-	    return opcion;
-}
 
 
