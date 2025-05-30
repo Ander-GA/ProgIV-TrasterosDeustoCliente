@@ -74,6 +74,7 @@ int main(int argc, char *argv[]) {
 	        	cout<<"--------------------"<<endl;
 	            cout << "Ingrese usuario: ";
 	            cin >> usuarioAdmin;
+
 	            strcpy(sendBuff, usuarioAdmin);
 	            send(s, sendBuff, strlen(sendBuff) + 1, 0); // enviar usuario
 	            		//Que usuario ha recibido el servidor
@@ -86,7 +87,7 @@ int main(int argc, char *argv[]) {
 	            		//Que contraseña ha recibido el servidor
 						recv(s, recvBuff, sizeof(recvBuff), 0);  // recibir
 						cout<<recvBuff<<endl;
-	            memset(sendBuff, 0, sizeof(sendBuff)); // Limpiamos buffer
+				memset(recvBuff, 0, sizeof(recvBuff)); // Limpiamos buffer
 	            recv(s, recvBuff, sizeof(recvBuff), 0);  // recibimos resultado
 
 	            if (strcmp(recvBuff, "0") == 0) { // (1- INICIO CORRECTO/0- INICIO INCORRECTO)
@@ -165,7 +166,7 @@ int main(int argc, char *argv[]) {
 	                }
 	                break;
 	            }
-	            case '2':{
+	            case '2':{//ELIMINAR TRASTERO
 	            	char numTrastero[50];
 	            	cout << "ELIMINAR TRASTERO" << endl;
 	            	cout << "-----------------" << endl;
@@ -760,15 +761,25 @@ int main(int argc, char *argv[]) {
 										recv(s, recvBuff, sizeof(recvBuff), 0);
 										cout<<recvBuff<<endl;
 
+										//Recibimos flag
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										char usuarioAlquilado[20];
+										strcpy(usuarioAlquilado,recvBuff);
+
+
+										//Recibimos flag
 										memset(recvBuff, 0, sizeof(recvBuff));
 										recv(s, recvBuff, sizeof(recvBuff), 0);
 										flag = atoi(recvBuff);
+
+
 										switch (flag) {
 											case 0:
 												cout<<"\033[0;33mLo sentimos, este trastero no está disponible en nuestro catálogo.\033[0m"<<endl;
 												break;
 											case 1:
-												cout<<"\033[0;32mEl trastero con numero "<<numTrastero<< " ha sido correctamente alquilado por "<<nombreP<<" \033[0m"<<endl;
+												cout<<"\033[0;32mEl trastero con numero "<<numTrastero<< " ha sido correctamente alquilado por "<<usuarioAlquilado<<" \033[0m"<<endl;
 												break;
 											case 2:
 												cout<<"\033[0;31mNo existe este trastero en nuestro catálogo.\033[0m"<<endl;
@@ -780,8 +791,53 @@ int main(int argc, char *argv[]) {
 
 										break;
 									}
-									case '4'://Devolver trastero
-										break;
+									case '4':{//Devolver trastero
+										int flag;
+										char numTrastero[20];
+										cout<<"DEVOLVER TRASTERO"<<endl;
+										cout<<"--------------------"<<endl;
+										cout<<"Introduce el numero de trastero: ";
+										cin>>numTrastero;
+										// Enviar numero del trastero
+										memset(sendBuff, 0, sizeof(sendBuff));
+										strcpy(sendBuff, numTrastero);
+										send(s, sendBuff, strlen(sendBuff) + 1, 0);
+
+										// Recibir confirmacion de lo que ha recibido el servidor
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										cout<<recvBuff<<endl;
+
+										//Recibimos nombre
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										char usuarioAlquilado[20];
+										strcpy(usuarioAlquilado,recvBuff);
+
+
+										//Recibimos flag
+										memset(recvBuff, 0, sizeof(recvBuff));
+										recv(s, recvBuff, sizeof(recvBuff), 0);
+										flag = atoi(recvBuff);
+										switch (flag) {
+											case 0:
+												cout<<"\033[0;33mLo sentimos, este trastero ya está disponible en nuestro catálogo.\033[0m"<<endl;
+												break;
+											case 1:{
+												cout<<"\033[0;32mEl trastero con numero "<<numTrastero<< " ha sido correctamente devuelto por "<<usuarioAlquilado<<" \033[0m"<<endl;
+												break;
+											}
+											case 2:
+												cout<<"\033[0;31mEste trastero no ha sido alquilado por usted.\033[0m"<<endl;
+												break;
+											case 3:
+												cout<<"\033[0;31mEste trastero no esta en nuestro catalogo.\033[0m"<<endl;
+												break;
+											default:
+												cout<<"\033[0;31mNo se ha podido alquilar el trastero.\033[0m"<<endl;
+												break;
+										}
+										break;}
 									case '0':cout<<"Volviendo a menu Cliente..."<<endl;
 										break;
 									default:cout<<"\033[1;31mOpcion Incorrecta.\033[0m"<<endl;
