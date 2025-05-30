@@ -113,35 +113,24 @@ int main(int argc, char *argv[]) {
 	                // Mandamos el trastero al servidor
 	                sprintf(sendBuff, "%d", numeroTrastero);
 	                send(s, sendBuff, strlen(sendBuff) + 1, 0);
-	                //Que numero de trastero ha recibido el servidor
-	                		memset(recvBuff, 0, sizeof(recvBuff)); // Limpiar buffer antes de recibir
-	                		recv(s, recvBuff, sizeof(recvBuff), 0);
-	                		cout << recvBuff << endl;
+
 	                cout << "Metros Cuadrados: ";
 	                cin >> metrosCuadrados;
 	                sprintf(sendBuff, "%d", metrosCuadrados);
 					send(s, sendBuff, strlen(sendBuff) + 1, 0);
-	                //Que numero de trastero ha recibido el servidor
-							memset(recvBuff, 0, sizeof(recvBuff)); // Limpiar buffer antes de recibir
-							recv(s, recvBuff, sizeof(recvBuff), 0);
-							cout << recvBuff << endl;
 
 					cout << "Precio: ";
 					cin >> precio;
 					sprintf(sendBuff, "%f", precio);
 					send(s, sendBuff, strlen(sendBuff) + 1, 0);
-					//Recibir confirmación del servidor para el precio
-							memset(recvBuff, 0, sizeof(recvBuff)); // Limpiar buffer antes de recibir
-							recv(s, recvBuff, sizeof(recvBuff), 0);
-							cout << recvBuff << endl;
-
 	                // LA DISPONIBILIDAD, VALORACION Y NUMERO DE VALORACIONES YA LAS INICIALIZARA EL SERVIDOR
 	                if (numeroTrastero <= 0) {
 	                    cout << "\033[1;33mEl numero del trastero debe ser mayor a 0\033[0m" << endl;
 	                }
 	                else {
 	                    // Recibimos resultado de si el trastero se ha almacenado correctamente o no
-	                    recv(s, recvBuff, sizeof(recvBuff), 0);  // recibimos flag
+	                	memset(recvBuff, 0, sizeof(recvBuff));
+	                	recv(s, recvBuff, sizeof(recvBuff), 0);  // recibimos flag
 
 	                    // recvBuff es cadena, comparo con "1"
 	                    if (strcmp(recvBuff, "1") == 0) {
@@ -166,11 +155,6 @@ int main(int argc, char *argv[]) {
 	            	memset(sendBuff, 0, sizeof(sendBuff));
 	            	strcpy(sendBuff, numTrastero);
 	            	send(s, sendBuff, strlen(sendBuff) + 1, 0);
-
-	            	// Recibir confirmación de qué número recibió el servidor
-	            	memset(recvBuff, 0, sizeof(recvBuff));
-	            	recv(s, recvBuff, sizeof(recvBuff), 0);
-	            	cout << "Servidor recibió el trastero número: " << recvBuff << endl;
 
 	            	// Recibir el flag de resultado de la operación
 	            	memset(recvBuff, 0, sizeof(recvBuff));
@@ -245,15 +229,12 @@ int main(int argc, char *argv[]) {
 	            	    }
 	                break;
 	            }
-	            case '4':{
+	            case '4':{//VER TRASTEROS
 	            	opcionAdminTrasteros = menuTrasterosAdmin();
 	            	memset(sendBuff, 0, sizeof(sendBuff));
 					sprintf(sendBuff, "%c", opcionAdminTrasteros); // Enviar la opción correcta
 					send(s, sendBuff, strlen(sendBuff)+1, 0);
 
-					memset(recvBuff, 0, sizeof(recvBuff));
-					recv(s, recvBuff, sizeof(recvBuff), 0);
-					cout << recvBuff << endl;
 					switch (opcionAdminTrasteros) {
 					case '1':{
 						//VER TODOS LOS TRASTEROS
@@ -425,9 +406,7 @@ int main(int argc, char *argv[]) {
 	    		memset(sendBuff, 0, sizeof(sendBuff));
 				sprintf(sendBuff, "%c", opcionUsuario); // Enviar la opción
 				send(s, sendBuff, strlen(sendBuff)+1, 0);
-				memset(recvBuff, 0, sizeof(recvBuff));
-				recv(s, recvBuff, sizeof(recvBuff), 0);
-				cout << recvBuff << endl;
+
 
 				switch (opcionUsuario) {
 					case '1'://Iniciar sesion
@@ -443,11 +422,6 @@ int main(int argc, char *argv[]) {
 						sprintf(sendBuff, "%d", dni); // Convertir int a string
 						send(s, sendBuff, strlen(sendBuff) + 1, 0); // enviar DNI
 
-						// Recibir confirmación del DNI
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
-
 						cout << "Ingrese contraseña: ";
 						cin >> contrasena;
 
@@ -456,16 +430,10 @@ int main(int argc, char *argv[]) {
 						strcpy(sendBuff, contrasena);
 						send(s, sendBuff, strlen(sendBuff) + 1, 0); // enviar contraseña
 
-						// Recibir confirmación de la contraseña
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
-
 						//Para flags
 						// RECIBIR RESULTADO DE AUTENTICACIÓN
 						memset(recvBuff, 0, sizeof(recvBuff));
 						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout<<recvBuff<<endl;
 						dniUser = atoi(recvBuff);
 						if(dniUser!=-1){
 							//EL USUARIO HA INICIADO SESION
@@ -476,9 +444,7 @@ int main(int argc, char *argv[]) {
 								memset(sendBuff, 0, sizeof(sendBuff));
 								sprintf(sendBuff, "%c", opcionUsuarioMenu); // Enviar la opción
 								send(s, sendBuff, strlen(sendBuff)+1, 0);
-								memset(recvBuff, 0, sizeof(recvBuff));
-								recv(s, recvBuff, sizeof(recvBuff), 0);
-								cout << recvBuff << endl;
+
 
 								switch (opcionUsuarioMenu) {
 									case '1'://perfil
@@ -534,9 +500,7 @@ int main(int argc, char *argv[]) {
 											memset(sendBuff, 0, sizeof(sendBuff));
 											sprintf(sendBuff, "%c", opcionMenuCatalogo); // Enviar la opción
 											send(s, sendBuff, strlen(sendBuff)+1, 0);
-											memset(recvBuff, 0, sizeof(recvBuff));
-											recv(s, recvBuff, sizeof(recvBuff), 0);
-											cout << recvBuff << endl;
+
 											switch (opcionMenuCatalogo) {
 												case '1':{
 													//VER TODO EL CATALOGO
@@ -745,12 +709,8 @@ int main(int argc, char *argv[]) {
 										strcpy(sendBuff, numTrastero);
 										send(s, sendBuff, strlen(sendBuff) + 1, 0);
 
-										// Recibir confirmacion de lo que ha recibido el servidor
-										memset(recvBuff, 0, sizeof(recvBuff));
-										recv(s, recvBuff, sizeof(recvBuff), 0);
-										cout<<recvBuff<<endl;
 
-										//Recibimos flag
+										//Recibimos nombre del usuario
 										memset(recvBuff, 0, sizeof(recvBuff));
 										recv(s, recvBuff, sizeof(recvBuff), 0);
 										char usuarioAlquilado[20];
@@ -792,12 +752,7 @@ int main(int argc, char *argv[]) {
 										strcpy(sendBuff, numTrastero);
 										send(s, sendBuff, strlen(sendBuff) + 1, 0);
 
-										// Recibir confirmacion de lo que ha recibido el servidor
-										memset(recvBuff, 0, sizeof(recvBuff));
-										recv(s, recvBuff, sizeof(recvBuff), 0);
-										cout<<recvBuff<<endl;
-
-										//Recibimos nombre
+										//Recibimos nombre del usuario
 										memset(recvBuff, 0, sizeof(recvBuff));
 										recv(s, recvBuff, sizeof(recvBuff), 0);
 										char usuarioAlquilado[20];
@@ -852,11 +807,6 @@ int main(int argc, char *argv[]) {
 						strcpy(sendBuff, nombre);
 						send(s, sendBuff, strlen(sendBuff) + 1, 0);
 
-						// Recibir confirmación del nombre
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
-
 						cout << "Ingrese apellido: ";
 						cin >> apellido;
 
@@ -864,11 +814,6 @@ int main(int argc, char *argv[]) {
 						memset(sendBuff, 0, sizeof(sendBuff));
 						strcpy(sendBuff, apellido);
 						send(s, sendBuff, strlen(sendBuff) + 1, 0);
-
-						// Recibir confirmación del apellido
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
 
 						cout << "Ingrese email: ";
 						cin >> email;
@@ -878,11 +823,6 @@ int main(int argc, char *argv[]) {
 						strcpy(sendBuff, email);
 						send(s, sendBuff, strlen(sendBuff) + 1, 0);
 
-						// Recibir confirmación del email
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
-
 						cout << "Ingrese direccion: ";
 						cin >> direccion;
 
@@ -891,10 +831,6 @@ int main(int argc, char *argv[]) {
 						strcpy(sendBuff, direccion);
 						send(s, sendBuff, strlen(sendBuff) + 1, 0);
 
-						// Recibir confirmación de la direccion
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
 
 						cout << "Ingrese contraseña: ";
 						cin >> contrasenia;
@@ -904,10 +840,6 @@ int main(int argc, char *argv[]) {
 						strcpy(sendBuff, contrasenia);
 						send(s, sendBuff, strlen(sendBuff) + 1, 0);
 
-						// Recibir confirmación de la contraseña
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
 
 						cout << "Confirme contraseña: ";
 						cin >> confirmarContrasena;
@@ -917,10 +849,6 @@ int main(int argc, char *argv[]) {
 						strcpy(sendBuff, confirmarContrasena);
 						send(s, sendBuff, strlen(sendBuff) + 1, 0);
 
-						// Recibir confirmación de confirmar contraseña
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
 
 						cout << "Ingrese telefono: ";
 						cin >> telefono;
@@ -930,11 +858,6 @@ int main(int argc, char *argv[]) {
 						strcpy(sendBuff, telefono);
 						send(s, sendBuff, strlen(sendBuff) + 1, 0);
 
-						// Recibir confirmación del telefono
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
-
 						cout << "Ingrese DNI: ";
 						cin >> dniReg;
 
@@ -942,11 +865,6 @@ int main(int argc, char *argv[]) {
 						memset(sendBuff, 0, sizeof(sendBuff));
 						strcpy(sendBuff, dniReg);
 						send(s, sendBuff, strlen(sendBuff) + 1, 0);
-
-						// Recibir confirmación del DNI
-						memset(recvBuff, 0, sizeof(recvBuff));
-						recv(s, recvBuff, sizeof(recvBuff), 0);
-						cout << recvBuff << endl;
 
 						// RECIBIR RESULTADO DEL REGISTRO
 						memset(recvBuff, 0, sizeof(recvBuff));
