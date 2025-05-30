@@ -62,9 +62,6 @@ int main(int argc, char *argv[]) {
 		memset(sendBuff, 0, sizeof(sendBuff));
 		sprintf(sendBuff, "%c", opcion); // Enviar la opción
 		send(s, sendBuff, strlen(sendBuff)+1, 0);
-		memset(recvBuff, 0, sizeof(recvBuff));
-		recv(s, recvBuff, sizeof(recvBuff), 0);
-		cout << recvBuff << endl;
 	    switch (opcion) {
 	    case '1': {
 	        // admin
@@ -77,16 +74,12 @@ int main(int argc, char *argv[]) {
 
 	            strcpy(sendBuff, usuarioAdmin);
 	            send(s, sendBuff, strlen(sendBuff) + 1, 0); // enviar usuario
-	            		//Que usuario ha recibido el servidor
-	            		recv(s, recvBuff, sizeof(recvBuff), 0);  // recibir
-	            		cout<<recvBuff<<endl;
+
 	            cout << "Ingrese contraseña: ";
 	            cin >> contrasena;
 	            strcpy(sendBuff, contrasena);
 	            send(s, sendBuff, strlen(sendBuff) + 1, 0); // enviar contraseña
-	            		//Que contraseña ha recibido el servidor
-						recv(s, recvBuff, sizeof(recvBuff), 0);  // recibir
-						cout<<recvBuff<<endl;
+
 				memset(recvBuff, 0, sizeof(recvBuff)); // Limpiamos buffer
 	            recv(s, recvBuff, sizeof(recvBuff), 0);  // recibimos resultado
 
@@ -106,10 +99,6 @@ int main(int argc, char *argv[]) {
 	            memset(sendBuff, 0, sizeof(sendBuff));
 				sprintf(sendBuff, "%c", opcionAdmin); // Enviar la opción
 				send(s, sendBuff, strlen(sendBuff)+1, 0);
-				memset(recvBuff, 0, sizeof(recvBuff));
-				recv(s, recvBuff, sizeof(recvBuff), 0);
-				cout << recvBuff << endl;
-
 
 	            switch (opcionAdmin) {
 	            case '1': {
